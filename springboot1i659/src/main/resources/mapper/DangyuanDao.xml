@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dao.DangyuanDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.entity.DangyuanEntity" id="dangyuanMap">
+        <result property="dangyuanzhanghao" column="dangyuanzhanghao"/>
+        <result property="mima" column="mima"/>
+        <result property="dangyuanxingming" column="dangyuanxingming"/>
+        <result property="touxiang" column="touxiang"/>
+        <result property="lianxifangshi" column="lianxifangshi"/>
+        <result property="nianling" column="nianling"/>
+        <result property="xingbie" column="xingbie"/>
+        <result property="xueli" column="xueli"/>
+        <result property="shenfenzhenghao" column="shenfenzhenghao"/>
+        <result property="rudangshijian" column="rudangshijian"/>
+        <result property="zhibuzhanghao" column="zhibuzhanghao"/>
+        <result property="zhibumingcheng" column="zhibumingcheng"/>
+    </resultMap>
+
+	<select id="selectListVO"
+		resultType="com.entity.vo.DangyuanVO" >
+		SELECT * FROM dangyuan  dangyuan         
+        <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+	<select id="selectVO"
+		resultType="com.entity.vo.DangyuanVO" >
+		SELECT  dangyuan.* FROM dangyuan  dangyuan 	
+ 		<where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+
+    <select id="selectListView"
+		resultType="com.entity.view.DangyuanView" >
+
+		SELECT  dangyuan.* FROM dangyuan  dangyuan 	        
+        <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+	<select id="selectView"
+		resultType="com.entity.view.DangyuanView" >
+		SELECT * FROM dangyuan  dangyuan <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+
+    <select id="selectValue" resultType="map" >
+        SELECT ${params.xColumn}, sum(${params.yColumn}) total FROM dangyuan
+        <where> 1=1 ${ew.sqlSegment}</where>
+        group by ${params.xColumn}
+        limit 10
+    </select>
+
+    <select id="selectTimeStatValue" resultType="map" >
+        <if test = 'params.timeStatType == "日"'>
+                SELECT DATE_FORMAT(${params.xColumn},'%Y-%m-%d') ${params.xColumn}, sum(${params.yColumn}) total FROM dangyuan
+                <where> 1=1 ${ew.sqlSegment}</where>
+                group by DATE_FORMAT(${params.xColumn},'%Y-%m-%d')
+        </if>
+        <if test = 'params.timeStatType == "月"'>
+                SELECT DATE_FORMAT(${params.xColumn},'%Y-%m') ${params.xColumn}, sum(${params.yColumn}) total FROM dangyuan
+                <where> 1=1 ${ew.sqlSegment}</where>
+                group by DATE_FORMAT(${params.xColumn},'%Y-%m')
+        </if>
+        <if test = 'params.timeStatType == "年"'>
+                SELECT DATE_FORMAT(${params.xColumn},'%Y') ${params.xColumn}, sum(${params.yColumn}) total FROM dangyuan
+                <where> 1=1 ${ew.sqlSegment}</where>
+                group by DATE_FORMAT(${params.xColumn},'%Y')
+        </if>
+    </select>
+
+    <select id="selectGroup" resultType="map" >
+        SELECT ${params.column} , count(1) total FROM dangyuan
+        <where> 1=1 ${ew.sqlSegment}</where>
+        group by ${params.column}
+        limit 10
+    </select>
+
+    <select id="nianlingSectionStat" resultType="map" >
+        SELECT '青年' as nianling,case when t.青年 is null then 0 else t.青年 end total
+        from
+        (select
+        sum(case when nianling >= 18 and nianling &lt;= 35 then 1 else 0 end) as 青年,        sum(case when nianling >= 36 and nianling &lt;= 50 then 1 else 0 end) as 中年,        sum(case when nianling >= 51 then 1 else 0 end) as 中老年        from dangyuan
+        <where> 1=1 ${ew.sqlSegment}</where>
+        ) t
+        union all
+        SELECT '中年' as nianling,case when t.中年 is null then 0 else t.中年 end total
+        from
+        (select
+        sum(case when nianling >= 18 and nianling &lt;= 35 then 1 else 0 end) as 青年,        sum(case when nianling >= 36 and nianling &lt;= 50 then 1 else 0 end) as 中年,        sum(case when nianling >= 51 then 1 else 0 end) as 中老年        from dangyuan
+        <where> 1=1 ${ew.sqlSegment}</where>
+        ) t
+        union all
+        SELECT '中老年' as nianling,case when t.中老年 is null then 0 else t.中老年 end total
+        from
+        (select
+        sum(case when nianling >= 18 and nianling &lt;= 35 then 1 else 0 end) as 青年,        sum(case when nianling >= 36 and nianling &lt;= 50 then 1 else 0 end) as 中年,        sum(case when nianling >= 51 then 1 else 0 end) as 中老年        from dangyuan
+        <where> 1=1 ${ew.sqlSegment}</where>
+        ) t
+    </select>
+
+
+</mapper>
